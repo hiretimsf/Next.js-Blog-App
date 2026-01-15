@@ -1,5 +1,5 @@
 import { ClassValue, clsx } from "clsx";
-import DOMPurify from "isomorphic-dompurify";
+import sanitize from "sanitize-html";
 import { twMerge } from "tailwind-merge";
 
 // Shadcn UI and for Tailwind CSS
@@ -72,15 +72,18 @@ export const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve
 
 // Sanitize HTML to prevent XSS attacks
 export function sanitizeHtml(html: string): string {
-  return DOMPurify.sanitize(html, {
-    USE_PROFILES: { html: true },
-    ALLOWED_TAGS: [
+  return sanitize(html, {
+    allowedTags: [
       "p", "br", "strong", "em", "u", "s", "a", "ul", "ol", "li",
       "h1", "h2", "h3", "h4", "h5", "h6", "blockquote", "pre", "code",
       "img", "hr", "table", "thead", "tbody", "tr", "th", "td",
       "span", "div", "figure", "figcaption"
     ],
-    ALLOWED_ATTR: ["href", "src", "alt", "title", "class", "target", "rel"],
+    allowedAttributes: {
+      a: ["href", "target", "rel"],
+      img: ["src", "alt", "title"],
+      "*": ["class"],
+    },
   });
 }
 
